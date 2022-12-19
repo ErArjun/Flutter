@@ -1,9 +1,8 @@
-// ignore_for_file: sized_box_for_whitespace
-
 import 'package:flutter/material.dart';
 import 'widgets/new_transaction.dart';
 import 'models/transaction.dart';
 import 'widgets/transcation_list.dart';
+import './widgets/chart.dart';
 
 void main() => runApp(MyApp());
 
@@ -56,7 +55,17 @@ class _MyHomePageState extends State<MyHomePage> {
       date: DateTime.now(),
     ),
   ];
-//
+
+  List<Transaction> get _recentTransaction {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          const Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
+
   void _addNewTransaction(String title, double amount) {
     final newTx = Transaction(
         id: DateTime.now().toString(),
@@ -95,14 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Container(
-              width: double.infinity,
-              child: const Card(
-                color: Colors.blue,
-                elevation: 5,
-                child: Text('chart'),
-              ),
-            ),
+            Chart(_recentTransaction),
             TransactoionList(_userTransactions),
           ],
         ),

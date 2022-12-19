@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class NewTransaction extends StatefulWidget {
   final Function addTransaction;
 
-  NewTransaction(this.addTransaction);
+  const NewTransaction(this.addTransaction);
 
   @override
   State<NewTransaction> createState() => _NewTransactionState();
@@ -14,7 +14,7 @@ class _NewTransactionState extends State<NewTransaction> {
 
   final amountController = TextEditingController();
 
-  void submitData() {
+  void _submitData() {
     final enteredTitle = titleController.text;
     final enteredAmount = double.parse(amountController.text);
     if (enteredTitle.isEmpty || enteredAmount <= 0) {
@@ -37,7 +37,7 @@ class _NewTransactionState extends State<NewTransaction> {
                 labelText: 'Title',
               ),
               controller: titleController,
-              onSubmitted: (_) => submitData(),
+              onSubmitted: (_) => _submitData(),
             ),
             TextField(
               decoration: const InputDecoration(
@@ -45,12 +45,35 @@ class _NewTransactionState extends State<NewTransaction> {
               ),
               controller: amountController,
               keyboardType: TextInputType.number,
-              onSubmitted: (_) => submitData(),
+              onSubmitted: (_) => _submitData(),
             ),
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: Colors.purple),
-              onPressed: submitData,
-              child: const Text('Add Transaction'),
+            SizedBox(
+              height: 50,
+              child: Row(
+                children: [
+                  const Text('No date choosen!'),
+                  TextButton(
+                    onPressed: null,
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.purple,
+                    ),
+                    child: const Text(
+                      'Choose Date',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  style: TextButton.styleFrom(backgroundColor: Colors.purple),
+                  onPressed: _submitData,
+                  child: const Text('Add Transaction'),
+                ),
+              ],
             ),
           ],
         ),
