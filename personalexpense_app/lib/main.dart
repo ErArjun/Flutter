@@ -4,7 +4,15 @@ import 'models/transaction.dart';
 import 'widgets/transcation_list.dart';
 import './widgets/chart.dart';
 
-void main() => runApp(MyApp());
+//void main() => runApp(MyApp());
+void main() {
+//WidgetsFlutterBinding.ensureInitialized();
+//SystemChrome.setPreferredOrientations([
+//  DeviceOrientation.portraitUp,
+//  DeviceOrientation.portraitDown,
+//]);
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -93,25 +101,77 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  bool _showChart = false;
+
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final appBar = AppBar(
+      title: const Text('Personal Expenses'),
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.add),
+          onPressed: () => _startAddNewTx(context),
+        ),
+      ],
+    );
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Personal Expenses'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => _startAddNewTx(context),
-          ),
-        ],
-      ),
+      appBar: appBar,
       body: SingleChildScrollView(
         child: Column(
           // mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Chart(_recentTransaction),
-            TransactoionList(_userTransactions, _deleteTransaction),
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('show chart'),
+                  Switch(
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                    value: _showChart,
+                    onChanged: ((val) {
+                      setState(() {
+                        _showChart = val;
+                      });
+                    }),
+                  ),
+                ],
+              ),
+            if (isLandscape)
+              _showChart
+                  ? SizedBox(
+                      height: (MediaQuery.of(context).size.height -
+                              appBar.preferredSize.height -
+                              MediaQuery.of(context).padding.top) *
+                          0.7,
+                      child: Chart(_recentTransaction),
+                    )
+                  : SizedBox(
+                      height: (MediaQuery.of(context).size.height -
+                              appBar.preferredSize.height -
+                              MediaQuery.of(context).padding.top) *
+                          0.7,
+                      child: TransactoionList(
+                          _userTransactions, _deleteTransaction),
+                    ),
+            if (!isLandscape)
+              SizedBox(
+                height: (MediaQuery.of(context).size.height -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top) *
+                    0.3,
+                child: Chart(_recentTransaction),
+              ),
+            if (!isLandscape)
+              SizedBox(
+                height: (MediaQuery.of(context).size.height -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top) *
+                    0.7,
+                child: TransactoionList(_userTransactions, _deleteTransaction),
+              ),
           ],
         ),
       ),
