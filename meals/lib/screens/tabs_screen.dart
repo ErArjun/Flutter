@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meals/widgets/main_drawer.dart';
+
 import 'categories_screen.dart';
 import 'favorites_screen.dart';
 
@@ -8,32 +10,41 @@ class TabScreen extends StatefulWidget {
 }
 
 class _TabScreenState extends State<TabScreen> {
+  final List<Map<String, Object>> _pages = [
+    {'page': CategoriesScreen(), 'title': 'Meals'},
+    {'page': FavoritesScreen(), 'title': 'Favorite'},
+  ];
+  int currentIndex = 0;
+  void _selectPage(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Meals'),
-          bottom: const TabBar(
-            tabs: [
-              Tab(
-                icon: Icon(Icons.category),
-                text: 'Categories',
-              ),
-              Tab(
-                icon: Icon(Icons.star),
-                text: 'Favourites',
-              )
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_pages[currentIndex]['title'] as String),
+      ),
+      drawer: MainDrawer(),
+      body: _pages[currentIndex]['page'] as Widget,
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: _selectPage,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Colors.white,
+        selectedItemColor: Theme.of(context).colorScheme.secondary,
+        currentIndex: currentIndex,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.category),
+            label: 'Categories',
           ),
-        ),
-        body: TabBarView(
-          children: [
-            CategoriesScreen(),
-            FavoritesScreen(),
-          ],
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star),
+            label: 'Favorites',
+          ),
+        ],
       ),
     );
   }
