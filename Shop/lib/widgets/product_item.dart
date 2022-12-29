@@ -6,7 +6,7 @@ import '../models/product.dart';
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context);
+    final product = Provider.of<Product>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -16,13 +16,16 @@ class ProductItem extends StatelessWidget {
             product.title,
             textAlign: TextAlign.center,
           ),
-          leading: IconButton(
-            color: Theme.of(context).colorScheme.secondary,
-            onPressed: () {
-              Provider.of<Product>(context).toggleFavorite();
-            },
-            icon: Icon(
-                product.isFavorite ? Icons.favorite : Icons.favorite_border),
+          leading: Consumer<Product>(
+            builder: ((context, product, child) => IconButton(
+                  onPressed: () {
+                    product.toggleFavorite();
+                  },
+                  icon: Icon(
+                    product.isFavorite ? Icons.favorite : Icons.favorite_border,
+                  ),
+                  color: Colors.deepOrange,
+                )),
           ),
           trailing: IconButton(
             color: Theme.of(context).colorScheme.secondary,
