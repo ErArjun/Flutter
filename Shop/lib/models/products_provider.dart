@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 
 import 'product.dart';
 
 class Products with ChangeNotifier {
-  final List<Product> _items = [
+  List<Product> _items = [];
+  /*final List<Product> _items = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -36,7 +40,7 @@ class Products with ChangeNotifier {
       imageUrl:
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
-  ];
+  ];*/
 
   List<Product> get items {
     return [..._items];
@@ -46,9 +50,49 @@ class Products with ChangeNotifier {
     return _items.where((item) => item.isFavorite).toList();
   }
 
-  void addProduct(Product product) {
+  Future<void> fetchAndSetProducts() async {
+    var url = Uri.https(
+        'shopflutter-88c80-default-rtdb.firebaseio.com', '/products.json');
+    try {
+      final response = await http.get(url);
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedData.forEach((key, value) {
+        loadedProducts.add(Product(
+          id: key,
+          title: value['title'],
+          description: value['description'],
+          price: value['price'],
+          imageUrl: value['imageUrl'],
+        ));
+      });
+      _items = loadedProducts;
+      notifyListeners();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> addProduct(Product product) async {
+    final http.Response response;
+    var url = Uri.https(
+        'shopflutter-88c80-default-rtdb.firebaseio.com', '/products.json');
+    try {
+      response = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'price': product.price,
+          'imageUrl': product.imageUrl,
+          'description': product.description,
+          'isFavorite': product.isFavorite,
+        }),
+      );
+    } catch (error) {
+      rethrow;
+    }
     final newProduct = Product(
-      id: DateTime.now().toString(),
+      id: json.decode(response.body)['name'],
       title: product.title,
       description: product.description,
       price: product.price,
