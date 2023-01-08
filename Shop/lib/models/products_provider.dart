@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:shop/models/http_exception.dart';
 
 import 'product.dart';
 
@@ -57,6 +58,9 @@ class Products with ChangeNotifier {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
+      if (extractedData.isEmpty) {
+        return;
+      }
       extractedData.forEach((key, value) {
         loadedProducts.add(Product(
           id: key,
@@ -64,6 +68,7 @@ class Products with ChangeNotifier {
           description: value['description'],
           price: value['price'],
           imageUrl: value['imageUrl'],
+          isFavorite: value['isFavorite'],
         ));
       });
       _items = loadedProducts;
@@ -106,14 +111,42 @@ class Products with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  void updateProduct(String id, Product product) {
+  Future<void> updateProduct(String id, Product product) async {
     final prodIndex = _items.indexWhere((element) => element.id == id);
-    _items[prodIndex] = product;
+    if (id.isNotEmpty) {
+      var url = Uri.https('shopflutter-88c80-default-rtdb.firebaseio.com',
+          '/products/$id.json');
+      try {
+        await http.patch(
+          url,
+          body: json.encode({
+            'title': product.title,
+            'price': product.price,
+            'imageUrl': product.imageUrl,
+            'description': product.description,
+          }),
+        );
+      } catch (error) {
+        rethrow;
+      }
+      _items[prodIndex] = product;
+    }
     notifyListeners();
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((element) => element.id == id);
+  Future<void> deleteProduct(String id) async {
+    final index = _items.indexWhere((element) => element.id == id);
+    final product = _items[index];
+    _items.removeAt(index);
     notifyListeners();
+    var url = Uri.https(
+        'shopflutter-88c80-default-rtdb.firebaseio.com', '/products/$id.json');
+
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _items.insert(index, product);
+      notifyListeners();
+      throw HttpException('could not delete produts');
+    }
   }
 }
