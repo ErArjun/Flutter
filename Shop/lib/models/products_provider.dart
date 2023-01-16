@@ -42,6 +42,10 @@ class Products with ChangeNotifier {
           'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
   ];*/
+  var authToken;
+  void update(auth) {
+    authToken = auth.token;
+  }
 
   List<Product> get items {
     return [..._items];
@@ -52,8 +56,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    var url = Uri.https(
-        'shopflutter-88c80-default-rtdb.firebaseio.com', '/products.json');
+    var url = Uri.https('shopflutter-88c80-default-rtdb.firebaseio.com',
+        '/products.json', {'auth': '$authToken'});
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -80,8 +84,8 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product product) async {
     final http.Response response;
-    var url = Uri.https(
-        'shopflutter-88c80-default-rtdb.firebaseio.com', '/products.json');
+    var url = Uri.https('shopflutter-88c80-default-rtdb.firebaseio.com',
+        '/products.json', {'auth': '$authToken'});
     try {
       response = await http.post(
         url,
@@ -115,7 +119,7 @@ class Products with ChangeNotifier {
     final prodIndex = _items.indexWhere((element) => element.id == id);
     if (id.isNotEmpty) {
       var url = Uri.https('shopflutter-88c80-default-rtdb.firebaseio.com',
-          '/products/$id.json');
+          '/products/$id.json', {'auth': '$authToken'});
       try {
         await http.patch(
           url,
