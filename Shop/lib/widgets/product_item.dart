@@ -23,7 +23,7 @@ class ProductItem extends StatelessWidget {
           leading: Consumer<Product>(
             builder: ((context, product, child) => IconButton(
                   onPressed: () {
-                    product.toggleFavorite(auth.token);
+                    product.toggleFavorite(auth.token, auth.userId);
                   },
                   icon: Icon(
                     product.isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -59,9 +59,14 @@ class ProductItem extends StatelessWidget {
               arguments: product.id,
             );
           },
-          child: Image.network(
-            product.imageUrl,
-            fit: BoxFit.cover,
+          child: Hero(
+            tag: product.id,
+            child: FadeInImage(
+              placeholder:
+                  const AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(product.imageUrl),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
