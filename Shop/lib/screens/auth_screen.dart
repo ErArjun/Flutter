@@ -286,7 +286,7 @@ class _AuthCardState extends State<AuthCard>
                     onPressed: _submit,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 35.0, vertical: 20.0),
+                          horizontal: 50.0, vertical: 20.0),
                       backgroundColor: Colors.purple,
                       shape: const StadiumBorder(),
                     ),
