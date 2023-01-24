@@ -82,7 +82,7 @@ class _orderButtonState extends State<orderButton> {
           ? null
           : () async {
               setState(() {
-                _isLoading = false;
+                _isLoading = true;
               });
               await order.addOrder(
                   widget.cart.items.values.toList(), widget.cart.totalAmount);
