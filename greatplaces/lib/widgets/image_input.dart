@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -11,18 +11,17 @@ class ImageInput extends StatefulWidget {
 }
 
 class _ImageInputState extends State<ImageInput> {
-  File? _storedImage;
-  Future<void> _takePicture() async {
+  var _storedImage;
+  Future _takePicture() async {
     final picker = ImagePicker();
     final imageFile = await picker.pickImage(
       source: ImageSource.camera,
-      maxWidth: 600,
-      preferredCameraDevice: CameraDevice.rear,
-      requestFullMetadata: true,
+      maxWidth:600,
     );
     setState(() {
       _storedImage = File(imageFile!.path);
     });
+    imageFile.
   }
 
   @override
@@ -40,7 +39,7 @@ class _ImageInputState extends State<ImageInput> {
           alignment: Alignment.center,
           child: _storedImage != null
               ? Image.file(
-                  _storedImage!,
+                  _storedImage,
                   fit: BoxFit.cover,
                   width: double.infinity,
                 )
