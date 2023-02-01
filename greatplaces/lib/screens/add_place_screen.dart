@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:greatplaces/providers/great_places.dart';
+import 'dart:io';
 import 'package:greatplaces/widgets/image_input.dart';
+import 'package:provider/provider.dart';
 
 class AddPlaceScreen extends StatefulWidget {
   static const routeName = '/add-place';
@@ -9,7 +12,21 @@ class AddPlaceScreen extends StatefulWidget {
 }
 
 class _AddPlaceScreenState extends State<AddPlaceScreen> {
-  final _textController = TextEditingController();
+  final _titleController = TextEditingController();
+  File? _pickedImage;
+  void _selectedImage(File? pickedImage) {
+    _pickedImage = pickedImage;
+  }
+
+  void _savePlace() {
+    if (_titleController.text.isEmpty || _pickedImage == null) {
+      return;
+    }
+    Provider.of<GreatPlaces>(context)
+        .addPlace(_titleController.text, _pickedImage);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,24 +44,12 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                   children: [
                     TextField(
                       decoration: const InputDecoration(labelText: 'Title'),
-                      controller: _textController,
+                      controller: _titleController,
                     ),
                     const SizedBox(
                       height: 10,
                     ),
-                    const ImageInput(),
-                    TextField(
-                      decoration: const InputDecoration(labelText: 'Title'),
-                      controller: _textController,
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(labelText: 'Title'),
-                      controller: _textController,
-                    ),
-                    TextField(
-                      decoration: const InputDecoration(labelText: 'Title'),
-                      controller: _textController,
-                    ),
+                    ImageInput(_selectedImage),
                   ],
                 ),
               ),
@@ -52,7 +57,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: _savePlace,
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               foregroundColor: Colors.black,
